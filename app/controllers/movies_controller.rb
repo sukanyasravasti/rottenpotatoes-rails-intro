@@ -40,7 +40,7 @@ class MoviesController < ApplicationController
       redirect = true
     end
     
-    #style
+    #style and highlight
       if @sort == 'title'
         @css_title = 'hilite'
       elsif @sort == 'release_date'
