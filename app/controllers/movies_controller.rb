@@ -11,7 +11,49 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.ratings
+    
+    #these arrays will be updated later on
+    @sort             = []
+    @select = []
+    
+    
+    redirect= false
+    
+    #if hash containing ratings is not empty
+    if !(params[:ratings]).nil?
+      params[:ratings].each {|key, value| @select << key}
+      session[:ratings] = @select
+      
+    #if hash containing ratings is empty (going back for example, restore to previous session ratings and then redirect)
+    elsif !(session[:ratings]).nil?
+        @select = session[:ratings]
+        redirect = true
+    end
+    
+    #similar logic follows here as above
+    if !(params[:sort]).nil?
+      @sort = params[:sort]
+      session[:sort] = @sort
+    elsif !(session[:sort]).nil?
+      @sort = session[:sort]
+      redirect = true
+    end
+    
+    #style
+      if @sort == 'title'
+        @css_title = 'hilite'
+      elsif @sort == 'release_date'
+        @css_release_date = 'hilite'
+      end
+    #
+    
+    if redirect == true
+      redirect_to movies_path :ratings=>@select, :sort=>@sort
+    else
+      @movies = Movie.where(:rating => @select).order(@sort)
+    end
+    
   end
 
   def new
